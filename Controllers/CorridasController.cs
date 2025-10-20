@@ -326,13 +326,70 @@ namespace FrotaTaxi.Controllers
                 ";
 
                 // Enviar para o e-mail solicitado pelo usuário
-                await SendEmail(new[] { "munhoz82@gmail.com" }, subject, body);
+                //await SendEmailSmtp(new[] { "munhoz82@gmail.com" }, subject, body);
+                await SendEmailSmtp("jmunhoz@dnways.com", subject, body);
             }
             catch (Exception ex)
             {
                 // Log error
                 Console.WriteLine($"Error sending email: {ex.Message}");
             }
+        }
+
+        public async Task SendEmailSmtp(string to, string subject, string body, bool isHtmlBody = true)
+        {
+            try
+            {
+                string appPassword = "tcov fjhi gnpq dulj";
+                var fromMail = new MailAddress("munhoz82@gmail.com", $"Frota");
+                var msg = new MailMessage();
+
+                msg.From = fromMail;
+                foreach (var item in to.Split(';'))
+                {
+                    msg.To.Add(item);
+                }
+                msg.Subject = subject;
+                msg.Body = body;
+                msg.IsBodyHtml = isHtmlBody;
+
+                //Obter do appsettings
+                SmtpClient smtp = GetSmtpClient(true, "munhoz82@gmail.com", appPassword);
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new System.Net.NetworkCredential("munhoz82@gmail.com", appPassword);
+
+                ServicePointManager.ServerCertificateValidationCallback =
+                    (s, certificate, chain, sslPolicyErrors) => true;
+
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+                try
+                {
+                    smtp.Send(msg);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public static SmtpClient GetSmtpClient(bool enableSsl, string userName, string pwd)
+        {
+            return new SmtpClient
+            {
+                Credentials = new NetworkCredential(userName, pwd),
+                EnableSsl = enableSsl,
+                Port = 587,
+                UseDefaultCredentials = false
+            };
         }
 
         private async Task SendEmail(string[] to, string subject, string body)
