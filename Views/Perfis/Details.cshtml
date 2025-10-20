@@ -1,0 +1,71 @@
+@model FrotaTaxi.Models.Perfil
+
+@{
+    ViewData["Title"] = "Detalhes do Perfil";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+                    
+                    <dt class="col-sm-3">Usuários</dt>
+                    <dd class="col-sm-9">@Model.Usuarios.Count()</dd>
+                </dl>
+                
+                <h5>Funcionalidades e Permissões</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Funcionalidade</th>
+                                <th>Consultar</th>
+                                <th>Editar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pf in Model.PerfilFuncionalidades)
+                            {
+                                <tr>
+                                    <td>@pf.Funcionalidade.Nome</td>
+                                    <td>
+                                        @if (pf.PodeConsultar)
+                                        {
+                                            <span class="badge badge-success">Sim</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Não</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (pf.PodeEditar)
+                                        {
+                                            <span class="badge badge-success">Sim</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Não</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="form-group">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+                    <a asp-action="Permissoes" asp-route-id="@Model.Id" class="btn btn-success">Configurar Permissões</a>
+                    <a asp-action="Index" class="btn btn-primary">Voltar à Lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

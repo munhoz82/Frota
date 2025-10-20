@@ -1,0 +1,41 @@
+@model FrotaTaxi.Models.Usuario
+
+@{
+    ViewData["Title"] = "Excluir Usuário";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5><i class="icon fas fa-exclamation-triangle"></i> Atenção!</h5>
+                    Tem certeza que deseja excluir este usuário?
+                </div>
+                
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Login)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Login)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Email)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Perfil)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Perfil.Nome)</dd>
+                </dl>
+                
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="submit" value="Excluir" class="btn btn-danger" />
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

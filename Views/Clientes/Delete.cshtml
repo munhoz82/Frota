@@ -1,0 +1,96 @@
+@model FrotaTaxi.Models.Cliente
+
+@{
+    ViewBag.Title = "Excluir Cliente";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Excluir Cliente</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="alert alert-warning">
+                        <i class="fa fa-warning"></i> Tem certeza que deseja excluir este cliente?
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="dl-horizontal">
+                                <dt>Nome:</dt>
+                                <dd>@Html.DisplayFor(model => model.Nome)</dd>
+                                
+                                <dt>CNPJ:</dt>
+                                <dd>@Html.DisplayFor(model => model.CNPJ)</dd>
+                                
+                                <dt>Email:</dt>
+                                <dd>@Html.DisplayFor(model => model.Email)</dd>
+                                
+                                <dt>Status:</dt>
+                                <dd>
+                                    @if (Model.Status == FrotaTaxi.Models.StatusEnum.Ativo)
+                                    {
+                                        <span class="label label-primary">Ativo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-warning">Inativo</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <dl class="dl-horizontal">
+                                <dt>Logradouro:</dt>
+                                <dd>@Html.DisplayFor(model => model.Logradouro)</dd>
+                                
+                                <dt>CEP:</dt>
+                                <dd>@Html.DisplayFor(model => model.CEP)</dd>
+                                
+                                <dt>Estado:</dt>
+                                <dd>@Html.DisplayFor(model => model.Estado)</dd>
+                                
+                                <dt>Cidade:</dt>
+                                <dd>@Html.DisplayFor(model => model.Cidade)</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    @if (Model.CentrosCusto != null && Model.CentrosCusto.Any())
+                    {
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h4>Centros de Custo (@Model.CentrosCusto.Count)</h4>
+                                <p class="text-muted">Este cliente possui centros de custo cadastrados que também serão excluídos.</p>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (Model.UsuariosAutorizados != null && Model.UsuariosAutorizados.Any())
+                    {
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h4>Usuários Autorizados (@Model.UsuariosAutorizados.Count)</h4>
+                                <p class="text-muted">Este cliente possui usuários autorizados que também serão excluídos.</p>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="hr-line-dashed"></div>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a class="btn btn-white" asp-action="Index">Cancelar</a>
+                                <button type="submit" class="btn btn-danger">Excluir</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

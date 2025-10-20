@@ -1,0 +1,389 @@
+@model FrotaTaxi.Models.Cliente
+
+@{
+    ViewBag.Title = "Editar Cliente";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Editar Cliente</h5>
+                </div>
+                <div class="ibox-content">
+                    <form asp-action="Edit" method="post" class="form-horizontal">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="tabs-container">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li><a class="nav-link active" data-toggle="tab" href="#tab-1">Informações Básicas</a></li>
+                                <li><a class="nav-link" data-toggle="tab" href="#tab-2">Centro de Custo</a></li>
+                                <li><a class="nav-link" data-toggle="tab" href="#tab-3">Usuários Autorizados</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <!-- Tab 1: Informações Básicas -->
+                                <div role="tabpanel" id="tab-1" class="tab-pane active">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label asp-for="Nome" class="col-sm-3 control-label">Nome *</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="Nome" class="form-control" maxlength="100" required />
+                                                        <span asp-validation-for="Nome" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="CNPJ" class="col-sm-3 control-label">CNPJ *</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="CNPJ" class="form-control cnpj-mask" maxlength="18" required />
+                                                        <span asp-validation-for="CNPJ" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Email" class="col-sm-3 control-label">Email *</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="Email" class="form-control" type="email" required />
+                                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Status" class="col-sm-3 control-label">Status *</label>
+                                                    <div class="col-sm-9">
+                                                        <select asp-for="Status" class="form-control" required>
+                                                            <option value="">Selecione...</option>
+                                                            <option value="1">Ativo</option>
+                                                            <option value="2">Inativo</option>
+                                                        </select>
+                                                        <span asp-validation-for="Status" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label asp-for="Logradouro" class="col-sm-3 control-label">Logradouro *</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="Logradouro" class="form-control" maxlength="200" required />
+                                                        <span asp-validation-for="Logradouro" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Numero" class="col-sm-3 control-label">Número</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="Numero" class="form-control" maxlength="10" />
+                                                        <span asp-validation-for="Numero" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Complemento" class="col-sm-3 control-label">Complemento</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="Complemento" class="form-control" maxlength="50" />
+                                                        <span asp-validation-for="Complemento" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="CEP" class="col-sm-3 control-label">CEP *</label>
+                                                    <div class="col-sm-9">
+                                                        <input asp-for="CEP" class="form-control cep-mask" maxlength="9" required />
+                                                        <span asp-validation-for="CEP" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Estado" class="col-sm-3 control-label">Estado *</label>
+                                                    <div class="col-sm-9">
+                                                        <select asp-for="Estado" id="estado" class="form-control" required>
+                                                            <option value="">Selecione o Estado...</option>
+                                                        </select>
+                                                        <span asp-validation-for="Estado" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label asp-for="Cidade" class="col-sm-3 control-label">Cidade *</label>
+                                                    <div class="col-sm-9">
+                                                        <select asp-for="Cidade" id="cidade" class="form-control" required>
+                                                            <option value="">Selecione a Cidade...</option>
+                                                        </select>
+                                                        <span asp-validation-for="Cidade" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab 2: Centro de Custo -->
+                                <div role="tabpanel" id="tab-2" class="tab-pane">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="addCentroCusto()">
+                                                    <i class="fa fa-plus"></i> Adicionar Centro de Custo
+                                                </button>
+                                                <br><br>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped" id="centrosCustoTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Código *</th>
+                                                                <th>Descrição *</th>
+                                                                <th>Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="centrosCustoBody">
+                                                            @if (Model.CentrosCusto != null)
+                                                            {
+                                                                var centrosCustoList = Model.CentrosCusto.ToList();
+                                                                @for (int i = 0; i < centrosCustoList.Count; i++)
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input name="centrosCusto[@i].Id" type="hidden" value="@centrosCustoList[i].Id" />
+                                                                            <input name="centrosCusto[@i].Codigo" class="form-control" maxlength="10" value="@centrosCustoList[i].Codigo" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input name="centrosCusto[@i].Descricao" class="form-control" maxlength="50" value="@centrosCustoList[i].Descricao" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <button type="button" class="btn btn-danger btn-xs" onclick="removeCentroCusto(this)">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab 3: Usuários Autorizados -->
+                                <div role="tabpanel" id="tab-3" class="tab-pane">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="addUsuarioAutorizado()">
+                                                    <i class="fa fa-plus"></i> Adicionar Usuário Autorizado
+                                                </button>
+                                                <br><br>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped" id="usuariosAutorizadosTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Nome *</th>
+                                                                <th>Funcional</th>
+                                                                <th>Tipo Solicitante *</th>
+                                                                <th>Status *</th>
+                                                                <th>Telefone 1 *</th>
+                                                                <th>Telefone 2 *</th>
+                                                                <th>Email *</th>
+                                                                <th>Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="usuariosAutorizadosBody">
+                                                            @if (Model.UsuariosAutorizados != null)
+                                                            {
+                                                                var usuariosAutorizadosList = Model.UsuariosAutorizados.ToList();
+                                                                @for (int i = 0; i < usuariosAutorizadosList.Count; i++)
+                                                                {
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input name="usuariosAutorizados[@i].Id" type="hidden" value="@usuariosAutorizadosList[i].Id" />
+                                                                            <input name="usuariosAutorizados[@i].Nome" class="form-control" maxlength="50" value="@usuariosAutorizadosList[i].Nome" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input name="usuariosAutorizados[@i].Funcional" class="form-control" maxlength="15" value="@usuariosAutorizadosList[i].Funcional" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <select name="usuariosAutorizados[@i].TipoSolicitante" class="form-control" required>
+                                                                                <option value="">Selecione...</option>
+                                                                                <option value="1" selected="@(usuariosAutorizadosList[i].TipoSolicitante == FrotaTaxi.Models.TipoSolicitanteEnum.Solicitante)">Solicitante</option>
+                                                                                <option value="2" selected="@(usuariosAutorizadosList[i].TipoSolicitante == FrotaTaxi.Models.TipoSolicitanteEnum.Usuario)">Usuário</option>
+                                                                                <option value="3" selected="@(usuariosAutorizadosList[i].TipoSolicitante == FrotaTaxi.Models.TipoSolicitanteEnum.Ambos)">Ambos</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <select name="usuariosAutorizados[@i].Status" class="form-control" required>
+                                                                                <option value="">Selecione...</option>
+                                                                                <option value="1" selected="@(usuariosAutorizadosList[i].Status == FrotaTaxi.Models.StatusEnum.Ativo)">Ativo</option>
+                                                                                <option value="2" selected="@(usuariosAutorizadosList[i].Status == FrotaTaxi.Models.StatusEnum.Inativo)">Inativo</option>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td>
+                                                                            <input name="usuariosAutorizados[@i].Telefone1" class="form-control phone-mask" maxlength="20" value="@usuariosAutorizadosList[i].Telefone1" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input name="usuariosAutorizados[@i].Telefone2" class="form-control phone-mask" maxlength="20" value="@usuariosAutorizadosList[i].Telefone2" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input name="usuariosAutorizados[@i].Email" type="email" class="form-control" value="@usuariosAutorizadosList[i].Email" required />
+                                                                        </td>
+                                                                        <td>
+                                                                            <button type="button" class="btn btn-danger btn-xs" onclick="removeUsuarioAutorizado(this)">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a class="btn btn-white" asp-action="Index">Cancelar</a>
+                                <button class="btn btn-primary" type="submit">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        var centroCustoIndex = @(Model.CentrosCusto?.ToList().Count ?? 0);
+        var usuarioAutorizadoIndex = @(Model.UsuariosAutorizados?.ToList().Count ?? 0);
+
+        $(document).ready(function() {
+            // Apply masks
+            $('.cnpj-mask').mask('00.000.000/0000-00');
+            $('.cep-mask').mask('00000-000');
+            $('.phone-mask').mask('(00) 00000-0000');
+
+            // Debug: Log model values
+            console.log('Model Estado from server:', '@Model.Estado');
+            console.log('Model Cidade from server:', '@Model.Cidade');
+
+            // Load estados and set current values
+            loadEstados();
+        });
+
+        function loadEstados() {
+            $.get('@Url.Action("GetEstados", "Clientes")', function(data) {
+                var select = $('#estado');
+                var currentEstado = '@Model.Estado';
+                select.empty().append('<option value="">Selecione o Estado...</option>');
+                $.each(data, function(i, item) {
+                    var selected = item.sigla === currentEstado ? 'selected' : '';
+                    select.append('<option value="' + item.sigla + '" ' + selected + '>' + item.nome + '</option>');
+                });
+                
+                // Load cities for current state
+                if (currentEstado) {
+                    loadCidades(currentEstado);
+                }
+            });
+        }
+
+        function loadCidades(uf) {
+            $.get('@Url.Action("GetCidades", "Clientes")', { uf: uf }, function(data) {
+                var select = $('#cidade');
+                var currentCidade = '@Html.Raw(Model.Cidade)';
+                select.empty().append('<option value="">Selecione a Cidade...</option>');
+                $.each(data, function(i, item) {
+                    select.append('<option value="' + item.nome + '">' + item.nome + '</option>');
+                });
+                
+                // Set the selected value after all options are added with a small delay
+                setTimeout(function() {
+                    if (currentCidade) {
+                        // Try to find exact match first
+                        var exactMatch = select.find('option[value="' + currentCidade + '"]');
+                        if (exactMatch.length > 0) {
+                            exactMatch.prop('selected', true);
+                        } else {
+                            // Fallback to val() method
+                            select.val(currentCidade);
+                        }
+                        // Force trigger change event to ensure selection is visible
+                        select.trigger('change');
+                    }
+                    
+                    // Debug log
+                    console.log('Current cidade from model:', "'" + currentCidade + "'");
+                    console.log('Cities loaded:', data.length);
+                    console.log('Selected value set to:', "'" + select.val() + "'");
+                    console.log('Available options:', select.find('option').map(function() { return "'" + $(this).val() + "'"; }).get());
+                    console.log('Exact match found:', select.find('option[value="' + currentCidade + '"]').length > 0);
+                }, 100);
+            });
+        }
+
+        $('#estado').change(function() {
+            var uf = $(this).val();
+            if (uf) {
+                loadCidades(uf);
+            } else {
+                $('#cidade').empty().append('<option value="">Selecione a Cidade...</option>');
+            }
+        });
+
+        function addCentroCusto() {
+            var html = '<tr>' +
+                '<td><input name="centrosCusto[' + centroCustoIndex + '].Codigo" class="form-control" maxlength="10" required /></td>' +
+                '<td><input name="centrosCusto[' + centroCustoIndex + '].Descricao" class="form-control" maxlength="50" required /></td>' +
+                '<td><button type="button" class="btn btn-danger btn-xs" onclick="removeCentroCusto(this)"><i class="fa fa-trash"></i></button></td>' +
+                '</tr>';
+            $('#centrosCustoBody').append(html);
+            centroCustoIndex++;
+        }
+
+        function removeCentroCusto(btn) {
+            $(btn).closest('tr').remove();
+        }
+
+        function addUsuarioAutorizado() {
+            var html = '<tr>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Nome" class="form-control" maxlength="50" required /></td>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Funcional" class="form-control" maxlength="15" /></td>' +
+                '<td><select name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].TipoSolicitante" class="form-control" required>' +
+                '<option value="">Selecione...</option>' +
+                '<option value="1">Solicitante</option>' +
+                '<option value="2">Usuário</option>' +
+                '<option value="3">Ambos</option>' +
+                '</select></td>' +
+                '<td><select name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Status" class="form-control" required>' +
+                '<option value="">Selecione...</option>' +
+                '<option value="1">Ativo</option>' +
+                '<option value="2">Inativo</option>' +
+                '</select></td>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Telefone1" class="form-control phone-mask" maxlength="20" required /></td>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Telefone2" class="form-control phone-mask" maxlength="20" required /></td>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Email" type="email" class="form-control" required /></td>' +
+                '<td><button type="button" class="btn btn-danger btn-xs" onclick="removeUsuarioAutorizado(this)"><i class="fa fa-trash"></i></button></td>' +
+                '</tr>';
+            $('#usuariosAutorizadosBody').append(html);
+            $('.phone-mask').mask('(00) 00000-0000');
+            usuarioAutorizadoIndex++;
+        }
+
+        function removeUsuarioAutorizado(btn) {
+            $(btn).closest('tr').remove();
+        }
+    </script>
+}

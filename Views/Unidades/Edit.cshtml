@@ -1,0 +1,130 @@
+@model FrotaTaxi.Models.Unidade
+
+@{
+    ViewBag.Title = "Editar Unidade";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Editar Unidade</h5>
+                </div>
+                <div class="ibox-content">
+                    <form asp-action="Edit" method="post" class="form-horizontal">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Nome" class="col-sm-3 control-label">Nome *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Nome" class="form-control" maxlength="50" required />
+                                        <span asp-validation-for="Nome" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="CPF" class="col-sm-3 control-label">CPF *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="CPF" class="form-control cpf-mask" maxlength="14" required />
+                                        <span asp-validation-for="CPF" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Apelido" class="col-sm-3 control-label">Apelido</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Apelido" class="form-control" maxlength="10" />
+                                        <span asp-validation-for="Apelido" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Celular" class="col-sm-3 control-label">Celular</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Celular" class="form-control celular-mask" maxlength="15" />
+                                        <span asp-validation-for="Celular" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Status" class="col-sm-3 control-label">Status *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="Status" class="form-control" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="1">Ativo</option>
+                                            <option value="2">Inativo</option>
+                                        </select>
+                                        <span asp-validation-for="Status" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Carro" class="col-sm-3 control-label">Carro *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Carro" class="form-control" maxlength="20" required />
+                                        <span asp-validation-for="Carro" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Placa" class="col-sm-3 control-label">Placa *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Placa" class="form-control placa-mask" maxlength="8" required />
+                                        <span asp-validation-for="Placa" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="IMEI" class="col-sm-3 control-label">IMEI</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="IMEI" class="form-control" maxlength="50" />
+                                        <span asp-validation-for="IMEI" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="PercentualCorrida" class="col-sm-3 control-label">% Corrida *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="PercentualCorrida" class="form-control" type="number" step="0.01" min="0" max="100" required />
+                                        <span asp-validation-for="PercentualCorrida" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a class="btn btn-white" asp-action="Index">Cancelar</a>
+                                <button class="btn btn-primary" type="submit">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Apply masks
+            $('.cpf-mask').mask('000.000.000-00');
+            $('.celular-mask').mask('(00) 00000-0000');
+            $('.placa-mask').mask('AAA-0000', {
+                translation: {
+                    'A': {pattern: /[A-Za-z]/},
+                    '0': {pattern: /[0-9]/}
+                }
+            });
+        });
+    </script>
+}

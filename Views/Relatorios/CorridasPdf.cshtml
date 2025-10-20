@@ -1,0 +1,289 @@
+@model FrotaTaxi.Controllers.RelatorioCorridasViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Relatório de Corridas - @Model.DataInicio.ToString("dd/MM/yyyy") a @Model.DataFim.ToString("dd/MM/yyyy")</title>
+    <style>
+        @@page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+        
+        .header p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-item h3 {
+            margin: 0;
+            color: #007bff;
+            font-size: 18px;
+        }
+        
+        .summary-item p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .totals-table th,
+        .totals-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .totals-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .totals-table tfoot th {
+            background-color: #333;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        
+        .details-table th,
+        .details-table td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+        
+        .details-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .details-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        
+        .badge-primary { background-color: #007bff; }
+        .badge-warning { background-color: #ffc107; color: #000; }
+        .badge-info { background-color: #17a2b8; }
+        .badge-success { background-color: #28a745; }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        .no-break {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RELATÓRIO DE CORRIDAS</h1>
+        <p>Período: @Model.DataInicio.ToString("dd/MM/yyyy") a @Model.DataFim.ToString("dd/MM/yyyy")</p>
+        @if (Model.ClienteId.HasValue)
+        {
+            var clienteSelecionado = Model.Clientes.FirstOrDefault(c => c.Id == Model.ClienteId.Value);
+            if (clienteSelecionado != null)
+            {
+                <p>Cliente: @clienteSelecionado.Nome</p>
+            }
+        }
+        else
+        {
+            <p>Cliente: Todos os Clientes</p>
+        }
+        <p>Gerado em: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+
+    <div class="summary no-break">
+        <div class="summary-item">
+            <h3>@Model.Corridas.Count</h3>
+            <p>Total de Corridas</p>
+        </div>
+        <div class="summary-item">
+            <h3>@Model.TotalGeral.ToString("C")</h3>
+            <p>Valor Total</p>
+        </div>
+        <div class="summary-item">
+            <h3>@(Model.Corridas.Count > 0 ? (Model.TotalGeral / Model.Corridas.Count).ToString("C") : "R$ 0,00")</h3>
+            <p>Valor Médio</p>
+        </div>
+    </div>
+
+    @if (Model.TotalPorData.Any())
+    {
+        <div class="no-break">
+            <h2>Totais por Data</h2>
+            <table class="totals-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Quantidade</th>
+                        <th>Valor Total</th>
+                        <th>Valor Médio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TotalPorData)
+                    {
+                        <tr>
+                            <td>@item.Data.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Quantidade</td>
+                            <td>@item.Valor.ToString("C")</td>
+                            <td>@(item.Quantidade > 0 ? (item.Valor / item.Quantidade).ToString("C") : "R$ 0,00")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>TOTAL</th>
+                        <th>@Model.Corridas.Count</th>
+                        <th>@Model.TotalGeral.ToString("C")</th>
+                        <th>@(Model.Corridas.Count > 0 ? (Model.TotalGeral / Model.Corridas.Count).ToString("C") : "R$ 0,00")</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+
+    <h2>Detalhes das Corridas</h2>
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Cliente</th>
+                <th>Solicitante</th>
+                <th>Origem</th>
+                <th>Destino</th>
+                <th>Unidade</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var corrida in Model.Corridas)
+            {
+                <tr>
+                    <td>@corrida.DataHoraAgendamento.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@corrida.Cliente?.Nome</td>
+                    <td>@corrida.Solicitante?.Nome</td>
+                    <td>@(corrida.EnderecoInicial?.Length > 30 ? corrida.EnderecoInicial.Substring(0, 30) + "..." : corrida.EnderecoInicial)</td>
+                    <td>@(corrida.EnderecoFinal?.Length > 30 ? corrida.EnderecoFinal.Substring(0, 30) + "..." : corrida.EnderecoFinal)</td>
+                    <td>@corrida.Unidade?.Nome</td>
+                    <td>
+                        @switch (corrida.TipoTarifa)
+                        {
+                            case FrotaTaxi.Models.TipoTarifaEnum.Livre:
+                                <span class="badge badge-primary">Livre</span>
+                                break;
+                            case FrotaTaxi.Models.TipoTarifaEnum.KM:
+                                <span class="badge badge-warning">KM</span>
+                                break;
+                            case FrotaTaxi.Models.TipoTarifaEnum.Trecho:
+                                <span class="badge badge-info">Trecho</span>
+                                break;
+                        }
+                    </td>
+                    <td>
+                        @switch (corrida.Status)
+                        {
+                            case FrotaTaxi.Models.StatusCorridaEnum.Agendado:
+                                <span class="badge badge-warning">Agendado</span>
+                                break;
+                            case FrotaTaxi.Models.StatusCorridaEnum.Realizado:
+                                <span class="badge badge-success">Realizado</span>
+                                break;
+                        }
+                    </td>
+                    <td>@corrida.Valor.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Corridas.Any())
+    {
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>Nenhuma corrida encontrada no período selecionado.</p>
+        </div>
+    }
+
+    <div class="footer">
+        <p>Sistema de Gerenciamento de Frota de Táxi - Relatório gerado automaticamente</p>
+    </div>
+
+    <script>
+        // Auto-abrir diálogo de impressão quando a página carregar
+        window.onload = function() {
+            // Pequeno delay para garantir que a página carregou completamente
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+        
+        // Fechar a aba após imprimir ou cancelar
+        window.onafterprint = function() {
+            window.close();
+        };
+    </script>
+</body>
+</html>

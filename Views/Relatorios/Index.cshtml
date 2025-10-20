@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Relatórios";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Relatório de Corridas</h5>
+                                        <p class="card-text">Visualize e exporte relatórios detalhados das corridas realizadas</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fa fa-car fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="@Url.Action("Corridas", "Relatorios")" class="btn btn-light">
+                                        <i class="fa fa-chart-bar"></i> Gerar Relatório
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Relatório Financeiro</h5>
+                                        <p class="card-text">Análise financeira e faturamento por período</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fa fa-dollar-sign fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-light" disabled>
+                                        <i class="fa fa-chart-line"></i> Em Breve
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">Relatório de Clientes</h5>
+                                        <p class="card-text">Estatísticas e análise do uso por cliente</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fa fa-users fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-light" disabled>
+                                        <i class="fa fa-chart-pie"></i> Em Breve
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

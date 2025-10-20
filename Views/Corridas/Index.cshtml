@@ -1,0 +1,171 @@
+@model IEnumerable<FrotaTaxi.Models.Corrida>
+@using FrotaTaxi.Helpers
+
+@{
+    ViewBag.Title = "Corridas";
+}
+
+@* Hidden form for anti-forgery token *@
+<form style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Lista de Corridas</h5>
+                    <div class="ibox-tools">
+                        @if (User.CanEdit("Corridas"))
+                        {
+                            <a asp-action="Create" class="btn btn-primary btn-xs">
+                                <i class="fa fa-plus"></i> Nova Corrida
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <!-- Filtros -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <form method="get" class="form-inline">
+                                <div class="form-group">
+                                    <label for="dataInicio">Data Início:</label>
+                                    <input type="date" name="dataInicio" id="dataInicio" class="form-control" value="@ViewBag.DataInicio" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataFim">Data Fim:</label>
+                                    <input type="date" name="dataFim" id="dataFim" class="form-control" value="@ViewBag.DataFim" />
+                                </div>
+                                <button type="submit" class="btn btn-primary">Filtrar</button>
+                            </form>
+                        </div>
+                    </div>
+                    <br />
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Cliente</th>
+                                    <th>Solicitante</th>
+                                    <th>Unidade</th>
+                                    <th>Tipo Tarifa</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.DataHoraAgendamento.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Cliente.Nome)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Solicitante.Nome)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Unidade.Nome)</td>
+                                        <td>
+                                            @switch (item.TipoTarifa)
+                                            {
+                                                case FrotaTaxi.Models.TipoTarifaEnum.Livre:
+                                                    <span class="label label-info">Livre</span>
+                                                    break;
+                                                case FrotaTaxi.Models.TipoTarifaEnum.KM:
+                                                    <span class="label label-warning">KM</span>
+                                                    break;
+                                                case FrotaTaxi.Models.TipoTarifaEnum.Trecho:
+                                                    <span class="label label-success">Trecho</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>@Html.DisplayFor(modelItem => item.Valor, "{0:C}")</td>
+                                        <td>
+                                            @if (item.Status == FrotaTaxi.Models.StatusCorridaEnum.Agendado)
+                                            {
+                                                <span class="label label-warning">Agendado</span>
+                                                @if (User.CanEdit("Corridas"))
+                                                {
+                                                    <button type="button" 
+                                                            class="btn btn-success btn-xs" 
+                                                            onclick="marcarRealizado(@item.Id)"
+                                                            style="margin-left: 5px;" 
+                                                            title="Marcar como Realizado">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="label label-primary">Realizado</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                @if (User.CanEdit("Corridas"))
+                                                {
+                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-xs">
+                                                        <i class="fa fa-edit"></i> Editar
+                                                    </a>
+                                                }
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-xs">
+                                                    <i class="fa fa-eye"></i> Detalhes
+                                                </a>
+                                                @if (User.CanEdit("Corridas"))
+                                                {
+                                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-xs">
+                                                        <i class="fa fa-trash"></i> Excluir
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.dataTables-example').DataTable({
+                pageLength: 25,
+                responsive: true,
+                dom: '<"html5buttons"B>lTfgitp',
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json'
+                },
+                order: [[0, 'desc']] // Order by date/time descending
+            });
+        });
+
+        // Direct test - bypass all event delegation
+        window.marcarRealizado = function(corridaId) {
+            console.log('marcarRealizado function called with ID:', corridaId);
+            
+            var confirmed = confirm('Confirma que a corrida foi realizada?');
+            console.log('User confirmed:', confirmed);
+            
+            if (confirmed) {
+                console.log('Navigating to:', '/Corridas/MarcarRealizado/' + corridaId);
+                window.location.href = '/Corridas/MarcarRealizado/' + corridaId;
+            } else {
+                console.log('User cancelled');
+            }
+        };
+        
+        console.log('marcarRealizado function defined globally');
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+}

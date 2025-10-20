@@ -1,0 +1,20 @@
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+        </div>
+        <ul class="nav navbar-top-links navbar-right">
+            <li>
+                <span class="m-r-sm text-muted welcome-message">Bem-vindo ao Gerenciamento de Frota</span>
+            </li>
+            <li>
+                <form asp-controller="Auth" asp-action="Logout" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" style="background: none; border: none; color: inherit; text-decoration: none; cursor: pointer; padding: 15px;">
+                        <i class="fa fa-sign-out"></i> Sair
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</div>

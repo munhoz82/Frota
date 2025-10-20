@@ -1,0 +1,87 @@
+@using FrotaTaxi.Helpers
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <img alt="image" class="rounded-circle" src="~/Images/profile_small.jpg"/>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="block m-t-xs font-bold">Gestão de Frota</span>
+                        
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a class="dropdown-item" href="#">Perfil</a></li>
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <form asp-controller="Auth" asp-action="Logout" method="post" style="margin: 0;">
+                                <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left;">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    FT+
+                </div>
+            </li>
+            
+            <li>
+                <a href="@Url.Action("Index", "Home")"><i class="fa fa-th-large"></i> <span class="nav-label">Home</span></a>
+            </li>
+            
+            @if (User.CanView("Clientes") || User.CanView("Unidades") || User.CanView("Trechos"))
+            {
+                <li>
+                    <a href="#"><i class="fa fa-users"></i> <span class="nav-label">Cadastros</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        @if (User.CanView("Clientes"))
+                        {
+                            <li><a href="@Url.Action("Index", "Clientes")">Clientes</a></li>
+                        }
+                        @if (User.CanView("Unidades"))
+                        {
+                            <li><a href="@Url.Action("Index", "Unidades")">Unidades</a></li>
+                        }
+                        @if (User.CanView("Trechos"))
+                        {
+                            <li><a href="@Url.Action("Index", "Trechos")">Trechos</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+            
+            @if (User.CanView("Corridas"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "Corridas")"><i class="fa fa-car"></i> <span class="nav-label">Corridas</span></a>
+                </li>
+            }
+            
+            @if (User.CanView("Relatorios"))
+            {
+                <li>
+                    <a href="@Url.Action("Index", "Relatorios")"><i class="fa fa-file-text"></i> <span class="nav-label">Relatórios</span></a>
+                </li>
+            }
+            
+            @if (User.CanView("Usuarios") || User.CanView("Perfis"))
+            {
+                <li>
+                    <a href="#"><i class="fa fa-shield"></i> <span class="nav-label">Segurança</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        @if (User.CanView("Usuarios"))
+                        {
+                            <li><a href="@Url.Action("Index", "Usuarios")">Usuários</a></li>
+                        }
+                        @if (User.CanView("Perfis"))
+                        {
+                            <li><a href="@Url.Action("Index", "Perfis")">Perfil de Acesso</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+</nav>

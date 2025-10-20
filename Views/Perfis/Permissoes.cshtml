@@ -1,0 +1,121 @@
+@model FrotaTaxi.Controllers.PerfilPermissoesViewModel
+
+@{
+    ViewData["Title"] = "Configurar Permissões";
+}
+
+<div class="row">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"] - @Model.NomePerfil</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Permissoes">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="PerfilId" />
+                    <input type="hidden" asp-for="NomePerfil" />
+                    
+                    <div class="alert alert-info">
+                        <strong>Instruções:</strong>
+                        <ul class="mb-0">
+                            <li><strong>Consultar:</strong> Permite visualizar e listar registros</li>
+                            <li><strong>Editar:</strong> Permite criar, editar e excluir registros (inclui automaticamente a permissão de consultar)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Funcionalidade</th>
+                                    <th>Controller/Action</th>
+                                    <th class="text-center">Consultar</th>
+                                    <th class="text-center">Editar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Funcionalidades.Count; i++)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(m => m.Funcionalidades[i].Nome)
+                                            <input type="hidden" asp-for="Funcionalidades[i].FuncionalidadeId" />
+                                            <input type="hidden" asp-for="Funcionalidades[i].Nome" />
+                                            <input type="hidden" asp-for="Funcionalidades[i].Controller" />
+                                            <input type="hidden" asp-for="Funcionalidades[i].Action" />
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                @Model.Funcionalidades[i].Controller/@Model.Funcionalidades[i].Action
+                                            </small>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="custom-control custom-checkbox">
+                                                <input asp-for="Funcionalidades[i].PodeConsultar" class="custom-control-input consultar-checkbox" data-index="@i" />
+                                                <label asp-for="Funcionalidades[i].PodeConsultar" class="custom-control-label"></label>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="custom-control custom-checkbox">
+                                                <input asp-for="Funcionalidades[i].PodeEditar" class="custom-control-input editar-checkbox" data-index="@i" />
+                                                <label asp-for="Funcionalidades[i].PodeEditar" class="custom-control-label"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn btn-info btn-sm" id="selectAll">Selecionar Todos</button>
+                        <button type="button" class="btn btn-warning btn-sm" id="selectNone">Limpar Todos</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="submit" value="Salvar Permissões" class="btn btn-primary" />
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Quando marcar "Editar", marcar automaticamente "Consultar"
+            $('.editar-checkbox').change(function() {
+                var index = $(this).data('index');
+                var consultarCheckbox = $('input[name="Funcionalidades[' + index + '].PodeConsultar"]');
+                
+                if ($(this).is(':checked')) {
+                    consultarCheckbox.prop('checked', true);
+                }
+            });
+            
+            // Quando desmarcar "Consultar", desmarcar automaticamente "Editar"
+            $('.consultar-checkbox').change(function() {
+                var index = $(this).data('index');
+                var editarCheckbox = $('input[name="Funcionalidades[' + index + '].PodeEditar"]');
+                
+                if (!$(this).is(':checked')) {
+                    editarCheckbox.prop('checked', false);
+                }
+            });
+            
+            // Selecionar todos
+            $('#selectAll').click(function() {
+                $('.editar-checkbox').prop('checked', true).trigger('change');
+            });
+            
+            // Limpar todos
+            $('#selectNone').click(function() {
+                $('.consultar-checkbox, .editar-checkbox').prop('checked', false);
+            });
+        });
+    </script>
+}

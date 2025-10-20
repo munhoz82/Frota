@@ -1,0 +1,102 @@
+@model IEnumerable<FrotaTaxi.Models.Usuario>
+@using FrotaTaxi.Helpers
+
+@{
+    ViewData["Title"] = "Usuários";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+                <div class="card-tools">
+                    @if (User.CanEdit("Usuarios"))
+                    {
+                        <a asp-action="Create" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Novo Usuário
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Nome)</th>
+                                <th>@Html.DisplayNameFor(model => model.Login)</th>
+                                <th>@Html.DisplayNameFor(model => model.Email)</th>
+                                <th>@Html.DisplayNameFor(model => model.Perfil)</th>
+                                <th>Status</th>
+                                <th>@Html.DisplayNameFor(model => model.DataCriacao)</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Login)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Perfil.Nome)</td>
+                                    <td>
+                                        @if (item.Ativo)
+                                        {
+                                            <span class="badge badge-success">Ativo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Inativo</span>
+                                        }
+                                    </td>
+                                    <td>@item.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm" title="Detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @if (User.CanEdit("Usuarios"))
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-action="AlterarSenha" asp-route-id="@item.Id" class="btn btn-secondary btn-sm" title="Alterar Senha">
+                                                    <i class="fas fa-key"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

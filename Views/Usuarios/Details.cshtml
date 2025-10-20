@@ -1,0 +1,51 @@
+@model FrotaTaxi.Models.Usuario
+
+@{
+    ViewData["Title"] = "Detalhes do Usuário";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Login)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Login)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Email)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Perfil)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Perfil.Nome)</dd>
+                    
+                    <dt class="col-sm-3">Status</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Ativo)
+                        {
+                            <span class="badge badge-success">Ativo</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">Inativo</span>
+                        }
+                    </dd>
+                    
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DataCriacao)</dt>
+                    <dd class="col-sm-9">@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+                
+                <div class="form-group">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+                    <a asp-action="AlterarSenha" asp-route-id="@Model.Id" class="btn btn-secondary">Alterar Senha</a>
+                    <a asp-action="Index" class="btn btn-primary">Voltar à Lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

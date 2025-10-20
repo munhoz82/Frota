@@ -1,0 +1,121 @@
+@model FrotaTaxi.Controllers.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestão de Frotas</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .login-header p {
+            color: #666;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            height: 45px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            height: 45px;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Gestão de Frotas</h2>
+            <p>Faça login para continuar</p>
+        </div>
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="form-group">
+                <label asp-for="Login" class="form-label"></label>
+                <input asp-for="Login" class="form-control" placeholder="Digite seu login" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Senha" class="form-label"></label>
+                <input asp-for="Senha" class="form-control" placeholder="Digite sua senha" />
+                <span asp-validation-for="Senha" class="text-danger"></span>
+            </div>
+
+            <div class="checkbox-container">
+                <input asp-for="LembrarMe" type="checkbox" />
+                <label asp-for="LembrarMe"></label>
+            </div>
+
+            <button type="submit" class="btn btn-login">Entrar</button>
+        </form>
+
+        
+    </div>
+
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

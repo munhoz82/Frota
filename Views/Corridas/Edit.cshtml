@@ -1,0 +1,281 @@
+@model FrotaTaxi.Models.Corrida
+
+@{
+    ViewBag.Title = "Editar Corrida";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Editar Corrida</h5>
+                </div>
+                <div class="ibox-content">
+                    <form asp-action="Edit" method="post" class="form-horizontal">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ClienteId" class="col-sm-3 control-label">Cliente *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.ClienteId" id="clienteSelect" required>
+                                            <option value="">Selecione o Cliente...</option>
+                                        </select>
+                                        <span asp-validation-for="ClienteId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="SolicitanteId" class="col-sm-3 control-label">Solicitante *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="SolicitanteId" class="form-control" asp-items="ViewBag.SolicitanteId" id="solicitanteSelect" required>
+                                            <option value="">Selecione o Solicitante...</option>
+                                        </select>
+                                        <span asp-validation-for="SolicitanteId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="TipoTarifa" class="col-sm-3 control-label">Tipo Tarifa *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="TipoTarifa" class="form-control" id="tipoTarifaSelect" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="1">Livre</option>
+                                            <option value="2">KM</option>
+                                            <option value="3">Trecho</option>
+                                        </select>
+                                        <span asp-validation-for="TipoTarifa" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="DataHoraAgendamento" class="col-sm-3 control-label">Data/Hora *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="DataHoraAgendamento" class="form-control" type="datetime-local" required />
+                                        <span asp-validation-for="DataHoraAgendamento" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="UnidadeId" class="col-sm-3 control-label">Unidade *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="UnidadeId" class="form-control" asp-items="ViewBag.UnidadeId" required>
+                                            <option value="">Selecione a Unidade...</option>
+                                        </select>
+                                        <span asp-validation-for="UnidadeId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <!-- Dynamic Fields based on Tipo Tarifa -->
+                                <div id="livreFields" style="display: none;">
+                                    <div class="form-group">
+                                        <label asp-for="EnderecoInicial" class="col-sm-3 control-label">Endereço Inicial</label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="EnderecoInicial" class="form-control" maxlength="200" />
+                                            <span asp-validation-for="EnderecoInicial" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label asp-for="EnderecoFinal" class="col-sm-3 control-label">Endereço Final</label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="EnderecoFinal" class="form-control" maxlength="200" />
+                                            <span asp-validation-for="EnderecoFinal" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="kmFields" style="display: none;">
+                                    <div class="form-group">
+                                        <label asp-for="KmInicial" class="col-sm-3 control-label">KM Inicial</label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="KmInicial" class="form-control" type="number" step="0.01" />
+                                            <span asp-validation-for="KmInicial" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label asp-for="KmFinal" class="col-sm-3 control-label">KM Final</label>
+                                        <div class="col-sm-9">
+                                            <input asp-for="KmFinal" class="form-control" type="number" step="0.01" />
+                                            <span asp-validation-for="KmFinal" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="trechoFields" style="display: none;">
+                                    <div class="form-group">
+                                        <label asp-for="TrechoId" class="col-sm-3 control-label">Trecho</label>
+                                        <div class="col-sm-9">
+                                            <select asp-for="TrechoId" class="form-control" asp-items="ViewBag.TrechoId" id="trechoSelect">
+                                                <option value="">Selecione o Trecho...</option>
+                                            </select>
+                                            <span asp-validation-for="TrechoId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Valor" class="col-sm-3 control-label">Valor *</label>
+                                    <div class="col-sm-9">
+                                        <input asp-for="Valor" class="form-control money-mask" required />
+                                        <span asp-validation-for="Valor" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="CentroCustoId" class="col-sm-3 control-label">Centro de Custo</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="CentroCustoId" class="form-control" asp-items="ViewBag.CentroCustoId" id="centroCustoSelect">
+                                            <option value="">Selecione o Centro de Custo...</option>
+                                        </select>
+                                        <span asp-validation-for="CentroCustoId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Status" class="col-sm-3 control-label">Status *</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="Status" class="form-control" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="1">Agendado</option>
+                                            <option value="2">Realizado</option>
+                                        </select>
+                                        <span asp-validation-for="Status" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Observacao" class="col-sm-3 control-label">Observação</label>
+                                    <div class="col-sm-9">
+                                        <textarea asp-for="Observacao" class="form-control" rows="3" maxlength="500"></textarea>
+                                        <span asp-validation-for="Observacao" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a class="btn btn-white" asp-action="Index">Cancelar</a>
+                                <button class="btn btn-primary" type="submit">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Apply money mask
+            $('.money-mask').mask('#.##0,00', {reverse: true});
+            
+            // Show fields based on current TipoTarifa
+            var currentTipoTarifa = $('#tipoTarifaSelect').val();
+            showFieldsByTipoTarifa(currentTipoTarifa);
+            
+            // Cliente change event
+            $('#clienteSelect').change(function() {
+                var clienteId = $(this).val();
+                if (clienteId) {
+                    loadSolicitantes(clienteId);
+                    loadCentrosCusto(clienteId);
+                    loadTrechos(clienteId);
+                } else {
+                    clearDependentSelects();
+                }
+            });
+            
+            // Tipo Tarifa change event
+            $('#tipoTarifaSelect').change(function() {
+                var tipoTarifa = $(this).val();
+                showFieldsByTipoTarifa(tipoTarifa);
+            });
+            
+            // Trecho change event
+            $('#trechoSelect').change(function() {
+                var trechoId = $(this).val();
+                if (trechoId) {
+                    // Get trecho value and set it to Valor field
+                    $.get('/api/trechos/' + trechoId, function(data) {
+                        if (data && data.valor) {
+                            $('#Valor').val(data.valor.toFixed(2).replace('.', ','));
+                        }
+                    });
+                }
+            });
+            
+            function loadSolicitantes(clienteId) {
+                $.get('/Corridas/GetSolicitantesByCliente', { clienteId: clienteId }, function(data) {
+                    var select = $('#solicitanteSelect');
+                    var currentValue = select.val();
+                    select.empty();
+                    select.append('<option value="">Selecione o Solicitante...</option>');
+                    $.each(data, function(index, item) {
+                        select.append('<option value="' + item.id + '">' + item.nome + '</option>');
+                    });
+                    select.val(currentValue);
+                });
+            }
+            
+            function loadCentrosCusto(clienteId) {
+                $.get('/Corridas/GetCentrosCustoByCliente', { clienteId: clienteId }, function(data) {
+                    var select = $('#centroCustoSelect');
+                    var currentValue = select.val();
+                    select.empty();
+                    select.append('<option value="">Selecione o Centro de Custo...</option>');
+                    $.each(data, function(index, item) {
+                        select.append('<option value="' + item.id + '">' + item.codigo + ' - ' + item.descricao + '</option>');
+                    });
+                    select.val(currentValue);
+                });
+            }
+            
+            function loadTrechos(clienteId) {
+                $.get('/Trechos/GetTrechosByCliente', { clienteId: clienteId }, function(data) {
+                    var select = $('#trechoSelect');
+                    var currentValue = select.val();
+                    select.empty();
+                    select.append('<option value="">Selecione o Trecho...</option>');
+                    $.each(data, function(index, item) {
+                        select.append('<option value="' + item.id + '">' + item.nomeTrecho + ' - R$ ' + item.valor.toFixed(2).replace('.', ',') + '</option>');
+                    });
+                    select.val(currentValue);
+                });
+            }
+            
+            function clearDependentSelects() {
+                $('#solicitanteSelect').empty().append('<option value="">Selecione o Solicitante...</option>');
+                $('#centroCustoSelect').empty().append('<option value="">Selecione o Centro de Custo...</option>');
+                $('#trechoSelect').empty().append('<option value="">Selecione o Trecho...</option>');
+            }
+            
+            function showFieldsByTipoTarifa(tipoTarifa) {
+                $('#livreFields, #kmFields, #trechoFields').hide();
+                
+                switch(tipoTarifa) {
+                    case '1': // Livre
+                        $('#livreFields').show();
+                        break;
+                    case '2': // KM
+                        $('#kmFields').show();
+                        break;
+                    case '3': // Trecho
+                        $('#trechoFields').show();
+                        break;
+                }
+            }
+        });
+    </script>
+}
