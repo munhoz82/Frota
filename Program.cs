@@ -1,8 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using FrotaTaxi.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using FrotaTaxi.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +54,16 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+var defaultCulture = new CultureInfo("pt-BR");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new[] { defaultCulture },
+    SupportedUICultures = new[] { defaultCulture }
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 
 app.Run();

@@ -73,6 +73,12 @@ namespace FrotaTaxi.Data
                 .HasForeignKey(c => c.CentroCustoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Corrida>()
+                .HasOne(c => c.Usuario)
+                .WithMany(ua => ua.CorridasComoUsuario)
+                .HasForeignKey(c => c.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<PerfilFuncionalidade>()
                 .HasOne(pf => pf.Perfil)
                 .WithMany(p => p.PerfilFuncionalidades)

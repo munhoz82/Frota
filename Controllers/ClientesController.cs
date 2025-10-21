@@ -212,12 +212,8 @@ namespace FrotaTaxi.Controllers
                 {
                     _context.Update(cliente);
 
-                    // Remove existing CentrosCusto and UsuariosAutorizados
-                    var existingCentrosCusto = _context.CentrosCusto.Where(cc => cc.ClienteId == id);
-                    _context.CentrosCusto.RemoveRange(existingCentrosCusto);
-
-                    var existingUsuarios = _context.UsuariosAutorizados.Where(ua => ua.ClienteId == id);
-                    _context.UsuariosAutorizados.RemoveRange(existingUsuarios);
+                    // Centros de Custo - Upsert e remoção segura
+                    var existingCentrosCusto = await _context.CentrosCusto.Where(cc => cc.ClienteId == id).ToListAsync();
 
                     // Add CentrosCusto from form data
                     var centrosCustoData = Request.Form.Where(x => x.Key.StartsWith("centrosCusto[")).ToList();
@@ -227,9 +223,11 @@ namespace FrotaTaxi.Controllers
                         var centrosCustoGroups = centrosCustoData
                             .GroupBy(x => x.Key.Split('[')[1].Split(']')[0])
                             .Where(g => g.Any(x => x.Key.Contains(".Codigo") && !string.IsNullOrEmpty(x.Value)));
-
+                        var postedCentroIds = new HashSet<int>();
                         foreach (var group in centrosCustoGroups)
                         {
+                            var idStr = group.Where(x => x.Key.Contains(".Id")).Select(x => x.Value.ToString()).FirstOrDefault();
+                            int.TryParse(idStr, out var centroId);
                             var codigoItem = group.FirstOrDefault(x => x.Key.Contains(".Codigo"));
                             var descricaoItem = group.FirstOrDefault(x => x.Key.Contains(".Descricao"));
                             var codigo = codigoItem.Value.ToString() ?? "";
@@ -237,18 +235,44 @@ namespace FrotaTaxi.Controllers
 
                             if (!string.IsNullOrEmpty(codigo) && !string.IsNullOrEmpty(descricao))
                             {
-                                var centroCusto = new CentroCusto
+                                if (centroId > 0)
                                 {
-                                    ClienteId = cliente.Id,
-                                    Codigo = codigo,
-                                    Descricao = descricao
-                                };
-                                _context.CentrosCusto.Add(centroCusto);
+                                    var existing = existingCentrosCusto.FirstOrDefault(cc => cc.Id == centroId);
+                                    if (existing != null)
+                                    {
+                                        existing.Codigo = codigo;
+                                        existing.Descricao = descricao;
+                                        postedCentroIds.Add(existing.Id);
+                                    }
+                                    else
+                                    {
+                                        // Caso o Id postado não exista mais, trata como novo
+                                        var novo = new CentroCusto { ClienteId = cliente.Id, Codigo = codigo, Descricao = descricao };
+                                        _context.CentrosCusto.Add(novo);
+                                    }
+                                }
+                                else
+                                {
+                                    var novo = new CentroCusto { ClienteId = cliente.Id, Codigo = codigo, Descricao = descricao };
+                                    _context.CentrosCusto.Add(novo);
+                                }
+                            }
+                        }
+                        // Remover centros não postados somente se não referenciados por Corridas
+                        var toRemoveCentros = existingCentrosCusto.Where(cc => !postedCentroIds.Contains(cc.Id)).ToList();
+                        foreach (var cc in toRemoveCentros)
+                        {
+                            bool isReferenced = await _context.Corridas.AnyAsync(c => c.CentroCustoId == cc.Id);
+                            if (!isReferenced)
+                            {
+                                _context.CentrosCusto.Remove(cc);
                             }
                         }
                     }
 
-                    // Add UsuariosAutorizados from form data
+                    // Usuários Autorizados - Upsert e remoção segura
+                    var existingUsuarios = await _context.UsuariosAutorizados.Where(ua => ua.ClienteId == id).ToListAsync();
+
                     var usuariosData = Request.Form.Where(x => x.Key.StartsWith("usuariosAutorizados[")).ToList();
                     Console.WriteLine($"DEBUG EDIT: Found {usuariosData.Count} usuario autorizado form fields");
                     if (usuariosData.Any())
@@ -257,8 +281,11 @@ namespace FrotaTaxi.Controllers
                             .GroupBy(x => x.Key.Split('[')[1].Split(']')[0])
                             .Where(g => g.Any(x => x.Key.Contains(".Nome") && !string.IsNullOrEmpty(x.Value)));
 
+                        var postedUsuarioIds = new HashSet<int>();
                         foreach (var group in usuariosGroups)
                         {
+                            var idStr = group.Where(x => x.Key.Contains(".Id")).Select(x => x.Value.ToString()).FirstOrDefault();
+                            int.TryParse(idStr, out var usuarioId);
                             var nome = group.Where(x => x.Key.Contains(".Nome")).Select(x => x.Value.ToString()).FirstOrDefault() ?? "";
                             var funcional = group.Where(x => x.Key.Contains(".Funcional")).Select(x => x.Value.ToString()).FirstOrDefault() ?? "";
                             var tipoSolicitante = group.Where(x => x.Key.Contains(".TipoSolicitante")).Select(x => x.Value.ToString()).FirstOrDefault() ?? "";
@@ -267,26 +294,70 @@ namespace FrotaTaxi.Controllers
                             var telefone2 = group.Where(x => x.Key.Contains(".Telefone2")).Select(x => x.Value.ToString()).FirstOrDefault() ?? "";
                             var email = group.Where(x => x.Key.Contains(".Email")).Select(x => x.Value.ToString()).FirstOrDefault() ?? "";
 
-                            if (!string.IsNullOrEmpty(nome) && !string.IsNullOrEmpty(email) && 
+                            if (!string.IsNullOrEmpty(nome) && !string.IsNullOrEmpty(email) &&
                                 !string.IsNullOrEmpty(tipoSolicitante) && !string.IsNullOrEmpty(status) &&
                                 !string.IsNullOrEmpty(telefone1))
                             {
                                 if (Enum.TryParse<TipoSolicitanteEnum>(tipoSolicitante, out var tipoSolicitanteEnum) &&
                                     Enum.TryParse<StatusEnum>(status, out var statusEnum))
                                 {
-                                    var usuario = new UsuarioAutorizado
+                                    if (usuarioId > 0)
                                     {
-                                        ClienteId = cliente.Id,
-                                        Nome = nome,
-                                        Funcional = funcional,
-                                        TipoSolicitante = tipoSolicitanteEnum,
-                                        Status = statusEnum,
-                                        Telefone1 = telefone1,
-                                        Telefone2 = telefone2,
-                                        Email = email
-                                    };
-                                    _context.UsuariosAutorizados.Add(usuario);
+                                        var existing = existingUsuarios.FirstOrDefault(ua => ua.Id == usuarioId);
+                                        if (existing != null)
+                                        {
+                                            existing.Nome = nome;
+                                            existing.Funcional = funcional;
+                                            existing.TipoSolicitante = tipoSolicitanteEnum;
+                                            existing.Status = statusEnum;
+                                            existing.Telefone1 = telefone1;
+                                            existing.Telefone2 = telefone2;
+                                            existing.Email = email;
+                                            postedUsuarioIds.Add(existing.Id);
+                                        }
+                                        else
+                                        {
+                                            var novo = new UsuarioAutorizado
+                                            {
+                                                ClienteId = cliente.Id,
+                                                Nome = nome,
+                                                Funcional = funcional,
+                                                TipoSolicitante = tipoSolicitanteEnum,
+                                                Status = statusEnum,
+                                                Telefone1 = telefone1,
+                                                Telefone2 = telefone2,
+                                                Email = email
+                                            };
+                                            _context.UsuariosAutorizados.Add(novo);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var novo = new UsuarioAutorizado
+                                        {
+                                            ClienteId = cliente.Id,
+                                            Nome = nome,
+                                            Funcional = funcional,
+                                            TipoSolicitante = tipoSolicitanteEnum,
+                                            Status = statusEnum,
+                                            Telefone1 = telefone1,
+                                            Telefone2 = telefone2,
+                                            Email = email
+                                        };
+                                        _context.UsuariosAutorizados.Add(novo);
+                                    }
                                 }
+                            }
+                        }
+
+                        // Remover usuários não postados somente se não referenciados por Corridas
+                        var toRemoveUsuarios = existingUsuarios.Where(ua => !postedUsuarioIds.Contains(ua.Id)).ToList();
+                        foreach (var ua in toRemoveUsuarios)
+                        {
+                            bool isReferenced = await _context.Corridas.AnyAsync(c => c.SolicitanteId == ua.Id);
+                            if (!isReferenced)
+                            {
+                                _context.UsuariosAutorizados.Remove(ua);
                             }
                         }
                     }

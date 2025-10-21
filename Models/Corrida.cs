@@ -47,6 +47,9 @@ namespace FrotaTaxi.Models
         public StatusCorridaEnum Status { get; set; }
 
         public int? CentroCustoId { get; set; }
+        
+        // Novo campo para Usuário (diferente do Solicitante)
+        public int? UsuarioId { get; set; }
 
         // Navigation properties
         [ForeignKey("ClienteId")]
@@ -63,6 +66,9 @@ namespace FrotaTaxi.Models
 
         [ForeignKey("CentroCustoId")]
         public virtual CentroCusto? CentroCusto { get; set; }
+
+        [ForeignKey("UsuarioId")]
+        public virtual UsuarioAutorizado? Usuario { get; set; }
     }
 
     public enum TipoTarifaEnum

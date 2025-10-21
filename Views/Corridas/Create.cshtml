@@ -38,6 +38,16 @@
                                 </div>
                                 
                                 <div class="form-group">
+                                    <label asp-for="UsuarioId" class="col-sm-3 control-label">Usuário</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="UsuarioId" class="form-control" id="usuarioSelect">
+                                            <option value="">Selecione o Usuário...</option>
+                                        </select>
+                                        <span asp-validation-for="UsuarioId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
                                     <label asp-for="TipoTarifa" class="col-sm-3 control-label">Tipo Tarifa *</label>
                                     <div class="col-sm-9">
                                         <select asp-for="TipoTarifa" class="form-control" id="tipoTarifaSelect" required>
@@ -190,6 +200,7 @@
                 var clienteId = $(this).val();
                 if (clienteId) {
                     loadSolicitantes(clienteId);
+                    loadUsuarios(clienteId);
                     loadCentrosCusto(clienteId);
                     loadTrechos(clienteId);
                 } else {
@@ -226,6 +237,17 @@
                     });
                 });
             }
+
+            function loadUsuarios(clienteId) {
+                $.get('/Corridas/GetUsuariosByCliente', { clienteId: clienteId }, function(data) {
+                    var select = $('#usuarioSelect');
+                    select.empty();
+                    select.append('<option value="">Selecione o Usuário...</option>');
+                    $.each(data, function(index, item) {
+                        select.append('<option value="' + item.id + '">' + item.nome + '</option>');
+                    });
+                });
+            }
             
             function loadCentrosCusto(clienteId) {
                 $.get('/Corridas/GetCentrosCustoByCliente', { clienteId: clienteId }, function(data) {
@@ -251,6 +273,7 @@
             
             function clearDependentSelects() {
                 $('#solicitanteSelect').empty().append('<option value="">Selecione o Solicitante...</option>');
+                $('#usuarioSelect').empty().append('<option value="">Selecione o Usuário...</option>');
                 $('#centroCustoSelect').empty().append('<option value="">Selecione o Centro de Custo...</option>');
                 $('#trechoSelect').empty().append('<option value="">Selecione o Trecho...</option>');
             }

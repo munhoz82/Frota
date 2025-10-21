@@ -45,6 +45,7 @@ namespace FrotaTaxi.Controllers
             var corridasQuery = _context.Corridas
                 .Include(c => c.Cliente)
                 .Include(c => c.Solicitante)
+                .Include(c => c.Usuario)
                 .Include(c => c.Trecho)
                 .Include(c => c.Unidade)
                 .Include(c => c.CentroCusto)

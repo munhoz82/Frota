@@ -26,10 +26,24 @@ namespace FrotaTaxi.Controllers
         public async Task<IActionResult> Index(DateTime? dataInicio, DateTime? dataFim)
         {
             ViewBag.Title = "Corridas";
-            
+
+            if (!dataInicio.HasValue && !dataFim.HasValue)
+            {
+                // Show today's rides by default
+                var hoje = DateTime.Today;
+                var inicio = hoje.AddDays((hoje.Day - 1) * -1);
+
+                dataInicio = inicio;
+                dataFim = hoje;
+
+                ViewBag.DataInicio = inicio.ToString("yyyy-MM-dd");
+                ViewBag.DataFim = hoje.ToString("yyyy-MM-dd");
+            }
+
             var corridas = _context.Corridas
                 .Include(c => c.Cliente)
                 .Include(c => c.Solicitante)
+                .Include(c => c.Usuario)
                 .Include(c => c.Unidade)
                 .Include(c => c.Trecho)
                 .Include(c => c.CentroCusto)
@@ -47,14 +61,7 @@ namespace FrotaTaxi.Controllers
                 ViewBag.DataFim = dataFim.Value.ToString("yyyy-MM-dd");
             }
 
-            if (!dataInicio.HasValue && !dataFim.HasValue)
-            {
-                // Show today's rides by default
-                var hoje = DateTime.Today;
-                corridas = corridas.Where(c => c.DataHoraAgendamento.Date == hoje);
-                ViewBag.DataInicio = hoje.ToString("yyyy-MM-dd");
-                ViewBag.DataFim = hoje.ToString("yyyy-MM-dd");
-            }
+            
 
             return View(await corridas.OrderByDescending(c => c.DataHoraAgendamento).ToListAsync());
         }
@@ -70,6 +77,7 @@ namespace FrotaTaxi.Controllers
             var corrida = await _context.Corridas
                 .Include(c => c.Cliente)
                 .Include(c => c.Solicitante)
+                .Include(c => c.Usuario)
                 .Include(c => c.Unidade)
                 .Include(c => c.Trecho)
                 .Include(c => c.CentroCusto)
@@ -95,12 +103,8 @@ namespace FrotaTaxi.Controllers
         // POST: Corridas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ClienteId,SolicitanteId,TipoTarifa,EnderecoInicial,EnderecoFinal,KmInicial,KmFinal,TrechoId,DataHoraAgendamento,UnidadeId,Valor,Observacao,Status,CentroCustoId")] Corrida corrida)
+        public async Task<IActionResult> Create([Bind("Id,ClienteId,SolicitanteId,UsuarioId,TipoTarifa,EnderecoInicial,EnderecoFinal,KmInicial,KmFinal,TrechoId,DataHoraAgendamento,UnidadeId,Valor,Observacao,Status,CentroCustoId")] Corrida corrida)
         {
-            Console.WriteLine($"DEBUG CORRIDA CREATE: POST method called");
-            Console.WriteLine($"DEBUG CORRIDA CREATE: ModelState.IsValid = {ModelState.IsValid}");
-            Console.WriteLine($"DEBUG CORRIDA CREATE: ClienteId = {corrida.ClienteId}, SolicitanteId = {corrida.SolicitanteId}");
-            
             if (!ModelState.IsValid)
             {
                 Console.WriteLine("DEBUG CORRIDA CREATE: ModelState errors:");
@@ -122,12 +126,9 @@ namespace FrotaTaxi.Controllers
                     }
                 }
 
-                Console.WriteLine($"DEBUG CORRIDA CREATE: Adding corrida to context");
                 _context.Add(corrida);
-                Console.WriteLine($"DEBUG CORRIDA CREATE: Calling SaveChangesAsync");
                 await _context.SaveChangesAsync();
-                Console.WriteLine($"DEBUG CORRIDA CREATE: SaveChangesAsync completed successfully");
-
+                
                 // Send email if status is Realizado
                 if (corrida.Status == StatusCorridaEnum.Realizado)
                 {
@@ -164,7 +165,7 @@ namespace FrotaTaxi.Controllers
         // POST: Corridas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,SolicitanteId,TipoTarifa,EnderecoInicial,EnderecoFinal,KmInicial,KmFinal,TrechoId,DataHoraAgendamento,UnidadeId,Valor,Observacao,Status,CentroCustoId")] Corrida corrida)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,SolicitanteId,UsuarioId,TipoTarifa,EnderecoInicial,EnderecoFinal,KmInicial,KmFinal,TrechoId,DataHoraAgendamento,UnidadeId,Valor,Observacao,Status,CentroCustoId")] Corrida corrida)
         {
             if (id != corrida.Id)
             {
@@ -261,10 +262,26 @@ namespace FrotaTaxi.Controllers
         public async Task<IActionResult> GetSolicitantesByCliente(int clienteId)
         {
             var solicitantes = await _context.UsuariosAutorizados
-                .Where(ua => ua.ClienteId == clienteId && ua.Status == StatusEnum.Ativo)
+                .Where(ua => ua.ClienteId == clienteId 
+                             && ua.Status == StatusEnum.Ativo 
+                             && (ua.TipoSolicitante == TipoSolicitanteEnum.Solicitante 
+                                 || ua.TipoSolicitante == TipoSolicitanteEnum.Ambos))
                 .Select(ua => new { ua.Id, ua.Nome })
                 .ToListAsync();
             return Json(solicitantes);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsuariosByCliente(int clienteId)
+        {
+            var usuarios = await _context.UsuariosAutorizados
+                .Where(ua => ua.ClienteId == clienteId 
+                             && ua.Status == StatusEnum.Ativo 
+                             && (ua.TipoSolicitante == TipoSolicitanteEnum.Usuario 
+                                 || ua.TipoSolicitante == TipoSolicitanteEnum.Ambos))
+                .Select(ua => new { ua.Id, ua.Nome })
+                .ToListAsync();
+            return Json(usuarios);
         }
 
         [HttpGet]
@@ -284,13 +301,23 @@ namespace FrotaTaxi.Controllers
             
             if (corrida?.ClienteId > 0)
             {
-                ViewData["SolicitanteId"] = new SelectList(_context.UsuariosAutorizados.Where(ua => ua.ClienteId == corrida.ClienteId && ua.Status == StatusEnum.Ativo), "Id", "Nome", corrida?.SolicitanteId);
+                ViewData["SolicitanteId"] = new SelectList(
+                    _context.UsuariosAutorizados.Where(ua => ua.ClienteId == corrida.ClienteId 
+                        && ua.Status == StatusEnum.Ativo 
+                        && (ua.TipoSolicitante == TipoSolicitanteEnum.Solicitante || ua.TipoSolicitante == TipoSolicitanteEnum.Ambos)),
+                    "Id", "Nome", corrida?.SolicitanteId);
+                ViewData["UsuarioId"] = new SelectList(
+                    _context.UsuariosAutorizados.Where(ua => ua.ClienteId == corrida.ClienteId 
+                        && ua.Status == StatusEnum.Ativo 
+                        && (ua.TipoSolicitante == TipoSolicitanteEnum.Usuario || ua.TipoSolicitante == TipoSolicitanteEnum.Ambos)),
+                    "Id", "Nome", corrida?.UsuarioId);
                 ViewData["TrechoId"] = new SelectList(_context.Trechos.Where(t => t.ClienteId == corrida.ClienteId && t.Status == StatusEnum.Ativo), "Id", "NomeTrecho", corrida?.TrechoId);
                 ViewData["CentroCustoId"] = new SelectList(_context.CentrosCusto.Where(cc => cc.ClienteId == corrida.ClienteId), "Id", "Codigo", corrida?.CentroCustoId);
             }
             else
             {
                 ViewData["SolicitanteId"] = new SelectList(new List<UsuarioAutorizado>(), "Id", "Nome");
+                ViewData["UsuarioId"] = new SelectList(new List<UsuarioAutorizado>(), "Id", "Nome");
                 ViewData["TrechoId"] = new SelectList(new List<Trecho>(), "Id", "NomeTrecho");
                 ViewData["CentroCustoId"] = new SelectList(new List<CentroCusto>(), "Id", "Codigo");
             }
@@ -325,9 +352,11 @@ namespace FrotaTaxi.Controllers
                     {(!string.IsNullOrEmpty(corrida.Observacao) ? $"<p><strong>Observação:</strong> {corrida.Observacao}</p>" : "")}
                 ";
 
+                var to = corrida.Cliente.Email + ";" + corrida.Solicitante.Email + ";" + "agendamento@jdstransp.com.br";
+                
                 // Enviar para o e-mail solicitado pelo usuário
                 //await SendEmailSmtp(new[] { "munhoz82@gmail.com" }, subject, body);
-                await SendEmailSmtp("jmunhoz@dnways.com", subject, body);
+                await SendEmailSmtp(to, subject, body);
             }
             catch (Exception ex)
             {
@@ -341,7 +370,7 @@ namespace FrotaTaxi.Controllers
             try
             {
                 string appPassword = "tcov fjhi gnpq dulj";
-                var fromMail = new MailAddress("munhoz82@gmail.com", $"Frota");
+                var fromMail = new MailAddress("munhoz82@gmail.com", $"Notificação JDS");
                 var msg = new MailMessage();
 
                 msg.From = fromMail;
@@ -375,9 +404,9 @@ namespace FrotaTaxi.Controllers
                     throw new Exception(ex.Message);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw new Exception(ex.Message);
             }
         }
 

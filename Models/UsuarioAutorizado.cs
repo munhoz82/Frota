@@ -41,6 +41,7 @@ namespace FrotaTaxi.Models
 
         // Navigation properties
         public virtual ICollection<Corrida> Corridas { get; set; } = new List<Corrida>();
+        public virtual ICollection<Corrida> CorridasComoUsuario { get; set; } = new List<Corrida>();
     }
 
     public enum TipoSolicitanteEnum

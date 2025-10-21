@@ -208,9 +208,11 @@
     <table class="details-table">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Data/Hora</th>
                 <th>Cliente</th>
                 <th>Solicitante</th>
+                <th>Usuário</th>
                 <th>Origem</th>
                 <th>Destino</th>
                 <th>Unidade</th>
@@ -223,9 +225,11 @@
             @foreach (var corrida in Model.Corridas)
             {
                 <tr>
+                    <td>@corrida.Id</td>
                     <td>@corrida.DataHoraAgendamento.ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@corrida.Cliente?.Nome</td>
                     <td>@corrida.Solicitante?.Nome</td>
+                    <td>@corrida.Usuario?.Nome</td>
                     <td>@(corrida.EnderecoInicial?.Length > 30 ? corrida.EnderecoInicial.Substring(0, 30) + "..." : corrida.EnderecoInicial)</td>
                     <td>@(corrida.EnderecoFinal?.Length > 30 ? corrida.EnderecoFinal.Substring(0, 30) + "..." : corrida.EnderecoFinal)</td>
                     <td>@corrida.Unidade?.Nome</td>

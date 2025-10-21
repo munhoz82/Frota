@@ -1,0 +1,40 @@
+-- Adicionar coluna UsuarioId (se não existir)
+IF COL_LENGTH('dbo.Corridas', 'UsuarioId') IS NULL
+BEGIN
+    ALTER TABLE dbo.Corridas
+    ADD UsuarioId INT NULL;
+END
+GO
+
+-- Criar índice na coluna UsuarioId (se não existir)
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_Corridas_UsuarioId'
+      AND object_id = OBJECT_ID('dbo.Corridas')
+)
+BEGIN
+    CREATE INDEX IX_Corridas_UsuarioId
+    ON dbo.Corridas (UsuarioId);
+END
+GO
+
+-- Adicionar FK para UsuariosAutorizados(Id) (se não existir)
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = 'FK_Corridas_UsuariosAutorizados_UsuarioId'
+      AND parent_object_id = OBJECT_ID('dbo.Corridas')
+)
+BEGIN
+    ALTER TABLE dbo.Corridas WITH NOCHECK
+    ADD CONSTRAINT FK_Corridas_UsuariosAutorizados_UsuarioId
+        FOREIGN KEY (UsuarioId)
+        REFERENCES dbo.UsuariosAutorizados (Id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION;
+
+    -- Opcional: verificar dados existentes após criar a FK
+    ALTER TABLE dbo.Corridas CHECK CONSTRAINT FK_Corridas_UsuariosAutorizados_UsuarioId;
+END
+GO
