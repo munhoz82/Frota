@@ -140,13 +140,21 @@ namespace FrotaTaxi.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Verifica se existem corridas vinculadas a esta unidade
+            var possuiCorridas = await _context.Corridas.AnyAsync(c => c.UnidadeId == id);
+            if (possuiCorridas)
+            {
+                TempData["ErrorMessage"] = "Não é possível excluir a unidade porque existem corridas vinculadas a ela.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var unidade = await _context.Unidades.FindAsync(id);
             if (unidade != null)
             {
                 _context.Unidades.Remove(unidade);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

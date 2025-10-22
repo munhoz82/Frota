@@ -21,6 +21,12 @@
                     </div>
                 </div>
                 <div class="ibox-content">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fa fa-times-circle"></i> @TempData["ErrorMessage"]
+                        </div>
+                    }
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered table-hover dataTables-example">
                             <thead>
