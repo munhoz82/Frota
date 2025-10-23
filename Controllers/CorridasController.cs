@@ -576,8 +576,8 @@ namespace FrotaTaxi.Controllers
         {
             try
             {
-                string appPassword = "tcov fjhi gnpq dulj";
-                var fromMail = new MailAddress("munhoz82@gmail.com", $"Notificação JDS");
+                string appPassword = "zmpm iyoi japa niqt";
+                var fromMail = new MailAddress("transportejds@gmail.com", $"Notificação JDS");
                 var msg = new MailMessage();
 
                 msg.From = fromMail;
@@ -590,12 +590,12 @@ namespace FrotaTaxi.Controllers
                 msg.IsBodyHtml = isHtmlBody;
 
                 //Obter do appsettings
-                SmtpClient smtp = GetSmtpClient(true, "munhoz82@gmail.com", appPassword);
+                SmtpClient smtp = GetSmtpClient(true, "transportejds@gmail.com", appPassword);
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new System.Net.NetworkCredential("munhoz82@gmail.com", appPassword);
+                smtp.Credentials = new System.Net.NetworkCredential("transportejds@gmail.com", appPassword);
 
                 ServicePointManager.ServerCertificateValidationCallback =
                     (s, certificate, chain, sslPolicyErrors) => true;
