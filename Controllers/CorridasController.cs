@@ -350,11 +350,12 @@ namespace FrotaTaxi.Controllers
                     Usuario = corrida.Usuario.Nome ?? "",
                     Unidade = corrida.Unidade.Nome,
                     TipoTarifa = Enum.GetName(typeof(TipoTarifaEnum), corrida.TipoTarifa),
-                    EndInicial = corrida.EnderecoInicial,
-                    EndFinal = corrida.EnderecoFinal,
+                    EndInicial = corrida.EnderecoInicial ?? "",
+                    EndFinal = corrida.EnderecoFinal ?? "",
                     Codigo = corrida.Id.ToString(),
                     Valor = corrida.Valor.ToString("N2", culturaBR),
-                    CentroCusto = corrida.CentroCusto.Descricao ?? ""
+                    CentroCusto = corrida.CentroCusto == null ? "" : (corrida.CentroCusto.Descricao ?? ""),
+                    Obs = corrida.Observacao ?? ""
                 };
                 var body = gerarBoleto(dadosBoleto);                
                 var to = corrida.Cliente.Email + ";" + corrida.Solicitante.Email + ";" + "agendamento@jdstransp.com.br";
@@ -524,8 +525,13 @@ namespace FrotaTaxi.Controllers
                                             <td style=""width:65%; vertical-align:top;"">
                                               <div style=""font-size:13px; color:#6b7280; margin-bottom:8px;"">Observações</div>
                                               <div style=""font-size:13px; color:#111827; line-height:1.4;"">
-                                                Recibo gerado automaticamente. Guarde este comprovante para fins de reembolso ou controle interno.
+                                                {dadosBoleto.Obs}
                                               </div>
+                                              </br>
+											  </br>
+											  <div style=""font-size:10px; color:#111827; line-height:1.4;"">
+												Recibo gerado automaticamente. Guarde este comprovante para fins de reembolso ou controle interno.
+											  </div>											  
                                             </td>                                            
                                           </tr>
                                         </table>
@@ -732,5 +738,6 @@ namespace FrotaTaxi.Controllers
         public string TipoTarifa { get; set; }
         public string Valor { get; set; }
         public string CentroCusto { get; set; }
+        public string Obs { get; set; }
     }
 }
