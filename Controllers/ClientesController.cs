@@ -200,7 +200,6 @@ namespace FrotaTaxi.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,CNPJ,Email,Status,Telefone1,Telefone2,Logradouro,Numero,Complemento,Bairro,CEP,Estado,Cidade")] Cliente cliente)
         {
             Console.WriteLine($"DEBUG EDIT: POST method called for client ID: {id}");
-            Console.WriteLine($"DEBUG EDIT: Form data count: {Request.Form.Count}");
             if (id != cliente.Id)
             {
                 return NotFound();

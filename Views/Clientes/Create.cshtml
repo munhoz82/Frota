@@ -159,6 +159,27 @@
                                                 <br><br>
                                                 <div class="table-responsive">
                                                     <table class="table table-striped" id="usuariosAutorizadosTable">
+                                                        <caption style="caption-side: top;">
+                                                            <div class="row" style="margin-bottom:10px;">
+                                                                <div class="col-md-6">
+                                                                    <input id="usuariosFilter" class="form-control" placeholder="Filtrar usuários..." />
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <select id="usuariosPageSize" class="form-control">
+                                                                        <option value="5">5 por página</option>
+                                                                        <option value="10">10 por página</option>
+                                                                        <option value="20">20 por página</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3 text-right">
+                                                                    <div class="btn-group">
+                                                                        <button type="button" id="usuariosPrev" class="btn btn-default btn-sm">Anterior</button>
+                                                                        <span id="usuariosPageInfo" style="padding:6px 10px; display:inline-block;"></span>
+                                                                        <button type="button" id="usuariosNext" class="btn btn-default btn-sm">Próxima</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </caption>
                                                         <thead>
                                                             <tr>
                                                                 <th>Nome *</th>
@@ -166,7 +187,7 @@
                                                                 <th>Tipo Solicitante *</th>
                                                                 <th>Status *</th>
                                                                 <th>Telefone 1 *</th>
-                                                                <th>Telefone 2 *</th>
+                                                                <th>Telefone 2</th>
                                                                 <th>Email *</th>
                                                                 <th>Ações</th>
                                                             </tr>
@@ -210,6 +231,12 @@
 
             // Load estados
             loadEstados();
+
+            $('#usuariosFilter').on('input', function () { usuariosCurrentPage = 1; renderUsuariosPage(); });
+            $('#usuariosPageSize').on('change', function () { usuariosPageSize = parseInt($(this).val()); usuariosCurrentPage = 1; renderUsuariosPage(); });
+            $('#usuariosPrev').on('click', function () { usuariosCurrentPage = Math.max(1, usuariosCurrentPage - 1); renderUsuariosPage(); });
+            $('#usuariosNext').on('click', function () { usuariosCurrentPage = usuariosCurrentPage + 1; renderUsuariosPage(); });
+            renderUsuariosPage();
         });
 
         function loadEstados() {
@@ -267,17 +294,53 @@
                 '<option value="2">Inativo</option>' +
                 '</select></td>' +
                 '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Telefone1" class="form-control phone-mask" maxlength="20" required /></td>' +
-                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Telefone2" class="form-control phone-mask" maxlength="20" required /></td>' +
+                '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Telefone2" class="form-control phone-mask" maxlength="20" /></td>' +
                 '<td><input name="usuariosAutorizados[' + usuarioAutorizadoIndex + '].Email" type="email" class="form-control" required /></td>' +
                 '<td><button type="button" class="btn btn-danger btn-xs" onclick="removeUsuarioAutorizado(this)"><i class="fa fa-trash"></i></button></td>' +
                 '</tr>';
-            $('#usuariosAutorizadosBody').append(html);
+            $('#usuariosAutorizadosBody').prepend(html);
             $('.phone-mask').mask('(00) 00000-0000');
             usuarioAutorizadoIndex++;
+            renderUsuariosPage();
         }
 
         function removeUsuarioAutorizado(btn) {
             $(btn).closest('tr').remove();
+            renderUsuariosPage();
+        }
+
+        var usuariosCurrentPage = 1;
+        var usuariosPageSize = 5;
+        function renderUsuariosPage() {
+            var q = ($('#usuariosFilter').val() || '').toLowerCase();
+            var rows = $('#usuariosAutorizadosBody tr');
+            rows.hide();
+            var matched = [];
+            rows.each(function () {
+                var $tr = $(this);
+                var buf = [];
+                $tr.find('input[type="text"], input[type="email"], input[type="tel"], input:not([type])').each(function(){
+                    var v = ($(this).val() || '').toString().toLowerCase();
+                    if (v) buf.push(v);
+                });
+                $tr.find('select').each(function(){
+                    var v = ($(this).find('option:selected').text() || '').toString().toLowerCase();
+                    if (v) buf.push(v);
+                });
+                var staticText = ($tr.clone().children().find(':input').remove().end().text() || '').toString().toLowerCase().replace(/\s+/g, ' ').trim();
+                if (staticText) buf.push(staticText);
+                var hay = buf.join(' ');
+                if (q === '' || hay.indexOf(q) >= 0) { matched.push(this); }
+            });
+            var total = matched.length;
+            var totalPages = Math.max(1, Math.ceil(total / usuariosPageSize));
+            if (usuariosCurrentPage > totalPages) { usuariosCurrentPage = totalPages; }
+            var start = (usuariosCurrentPage - 1) * usuariosPageSize;
+            var end = start + usuariosPageSize;
+            for (var i = start; i < end && i < total; i++) { $(matched[i]).show(); }
+            $('#usuariosPageInfo').text(total === 0 ? '0/0' : (usuariosCurrentPage + ' / ' + totalPages));
+            $('#usuariosPrev').prop('disabled', usuariosCurrentPage <= 1);
+            $('#usuariosNext').prop('disabled', usuariosCurrentPage >= totalPages);
         }
     </script>
 }
