@@ -237,6 +237,18 @@
             $('#usuariosPrev').on('click', function () { usuariosCurrentPage = Math.max(1, usuariosCurrentPage - 1); renderUsuariosPage(); });
             $('#usuariosNext').on('click', function () { usuariosCurrentPage = usuariosCurrentPage + 1; renderUsuariosPage(); });
             renderUsuariosPage();
+
+            // Validação customizada antes de enviar (cobre linhas paginadas/ocultas)
+            $('form').on('submit', function (e) {
+                var result = validateUsuariosBeforeSubmit();
+                if (!result.ok) {
+                    e.preventDefault();
+                    try { $('.nav-tabs a[href="#tab-3"]').tab('show'); } catch (_) {}
+                    usuariosCurrentPage = result.page;
+                    renderUsuariosPage();
+                    alert(result.message);
+                }
+            });
         });
 
         function loadEstados() {
@@ -311,6 +323,11 @@
 
         var usuariosCurrentPage = 1;
         var usuariosPageSize = 5;
+        function getEmailRegex() {
+            var at = String.fromCharCode(64);
+            var pattern = '^[^\\s' + at + ']+' + at + '[^\\s' + at + ']+\\.[^\\s' + at + ']+$';
+            return new RegExp(pattern);
+        }
         function renderUsuariosPage() {
             var q = ($('#usuariosFilter').val() || '').toLowerCase();
             var rows = $('#usuariosAutorizadosBody tr');
@@ -341,6 +358,40 @@
             $('#usuariosPageInfo').text(total === 0 ? '0/0' : (usuariosCurrentPage + ' / ' + totalPages));
             $('#usuariosPrev').prop('disabled', usuariosCurrentPage <= 1);
             $('#usuariosNext').prop('disabled', usuariosCurrentPage >= totalPages);
+        }
+
+        // Retorna { ok: boolean, page: number, message: string }
+        function validateUsuariosBeforeSubmit() {
+            var rows = $('#usuariosAutorizadosBody tr');
+            if (rows.length === 0) { return { ok: true, page: 1, message: '' }; }
+            var firstErrorIndex = -1;
+            var errors = [];
+            rows.each(function (idx) {
+                var $tr = $(this);
+                var nome = ($tr.find('input[name$=".Nome"]').val() || '').trim();
+                var tipo = ($tr.find('select[name$=".TipoSolicitante"]').val() || '').trim();
+                var status = ($tr.find('select[name$=".Status"]').val() || '').trim();
+                var tel1 = ($tr.find('input[name$=".Telefone1"]').val() || '').trim();
+                var email = ($tr.find('input[name$=".Email"]').val() || '').trim();
+                var rowErrors = [];
+                if (!nome) rowErrors.push('Nome');
+                if (!tipo) rowErrors.push('Tipo Solicitante');
+                if (!status) rowErrors.push('Status');
+                if (!tel1) rowErrors.push('Telefone 1');
+                if (!email) rowErrors.push('Email');
+                else {
+                    var emailOk = getEmailRegex().test(email);
+                    if (!emailOk) rowErrors.push('Email inválido');
+                }
+                if (rowErrors.length) {
+                    if (firstErrorIndex === -1) firstErrorIndex = idx;
+                    errors.push('Linha ' + (idx + 1) + ': ' + rowErrors.join(', '));
+                }
+            });
+            if (firstErrorIndex === -1) return { ok: true, page: usuariosCurrentPage, message: '' };
+            var page = Math.floor(firstErrorIndex / usuariosPageSize) + 1;
+            var msg = 'Há erros nos Usuários Autorizados. Vá até a página ' + page + ' e corrija:\n\n' + errors.slice(0, 5).join('\n') + (errors.length > 5 ? '\n...' : '');
+            return { ok: false, page: page, message: msg };
         }
     </script>
 }
